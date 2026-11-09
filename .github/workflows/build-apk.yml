@@ -22,13 +22,13 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Extract Android project
+        run: unzip -q mmt-online-source.zip -d package
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '8.13'
           cache-provider: basic
-      - name: Extract Android project
-        run: unzip -q mmt-online-source.zip -d package
       - name: Build debug APK
         working-directory: package/mmt-online/android
         run: gradle assembleDebug --no-daemon
