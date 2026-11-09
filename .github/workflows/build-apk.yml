@@ -1,0 +1,40 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'mmt-online-source.zip'
+      - '.github/workflows/build-apk.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.13'
+          cache-provider: basic
+      - name: Extract Android project
+        run: unzip -q mmt-online-source.zip -d package
+      - name: Build debug APK
+        working-directory: package/mmt-online/android
+        run: gradle assembleDebug --no-daemon
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mmt-online-debug-apk
+          path: package/mmt-online/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
